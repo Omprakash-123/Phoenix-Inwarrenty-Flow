@@ -11,8 +11,7 @@ on:
 
 jobs: 
     run-postman-tests:
-       runs-on: ubantu-latest
-
+       runs-on: ubuntu-latest
        steps:
          - name: Checkout the code
            uses: actions/checkout@v5.0.0
