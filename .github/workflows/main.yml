@@ -1,56 +1,48 @@
-name : Postman Collection Workflow
+name: Postman Collection Workflow
 
 on:
   push:
-    branches: [mail]
-  workflow_dispatch:  
+    branches: [main]   # ✅ fixed
+  workflow_dispatch:
   schedule:
-      - cron : 30 02 * * * # 8 am IST Every day 
-      - cron : 00 14 * * * # 730 pm IST Every day
-      - cron : 00 06 * * 1-5 # 1130 am IST Monday to Friday
+    - cron: '30 02 * * *' # 8 am IST Every day
+    - cron: '00 14 * * *' # 7:30 pm IST Every day
+    - cron: '00 06 * * 1-5' # 11:30 am IST Mon–Fri
 
-jobs: 
-    run-postman-tests:
-       runs-on: ubuntu-latest
-       steps:
-         - name: Checkout the code
-           uses: actions/checkout@v5.0.0
+jobs:
+  run-postman-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v5.0.0
 
-         - name: Install node.js 
-           uses: actions/setup-node@v5.0.0
-           with:
-               node-version: '22'
+      - name: Install node.js 
+        uses: actions/setup-node@v5.0.0
+        with:
+          node-version: '22'
 
-         - name: Install newman html-extra globally
-           run: |
-                 npm install -g newman
-                 npm install -g newman-reporter-htmlextra
+      - name: Install newman html-extra globally
+        run: |
+          npm install -g newman
+          npm install -g newman-reporter-htmlextra
 
-         - name: run the pm collection with newman
-           run: | 
-                 newman run Inwarrantly-flow.Collection.postman_collection.json \
-                 -d testdata.csv \
-                 -e QA.postman_environment.json \
-                 -r cli,htmlextra
+      - name: Run the pm collection with newman
+        run: |
+          newman run Inwarrantly-flow.Collection.postman_collection.json \
+            -d testdata.csv \
+            -e QA.postman_environment.json \
+            -r cli,htmlextra
 
-         - name: Newman report
-           if: always() # ensure that archive executed irrespective whether the previous steps are passed or fail
-           uses: actions/upload-artifact@v4.6.2
-              name:Newman report
-              path:newman/*.html
+      - name: Newman report
+        if: always() # ensure artifact even on failure
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: Newman report
+          path: newman/*.html
 
-         - name: Creating github page branch
-           if: always()
-           uses: peaceiris/actions-gh-pages@v4.0.0
-           with:
-             github_token: ${{ secrets.GITHUB_TOKEN}}
-             publish_dir: newman/
-             
-           
-         
-                 
-           
-             
-      
-      
-      
+      - name: Creating github page branch
+        if: always()
+        uses: peaceiris/actions-gh-pages@v4.0.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: newman/
