@@ -32,7 +32,7 @@ jobs:
             -d testdata.csv \
             -e QA.postman_environment.json \
             -r cli,htmlextra
-            --reporter-htmlextra-export
+            --reporter-htmlextra-export ./newman/index.html
 
       - name: Newman report
         if: always() # ensure artifact even on failure
